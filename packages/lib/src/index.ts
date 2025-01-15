@@ -400,7 +400,7 @@ export class TimescapeManager implements Options {
         if (type === "years") {
           return intermediateValue.padStart(4, "0");
         } else if (type === "milliseconds") {
-          return intermediateValue.padStart(3, "0");
+          return intermediateValue.padStart(4, "0");
         } else {
           const padLength = (type === "minutes" || type === "seconds") ? 2 : (this.digits === "2-digit" ? 2 : 1);
           return intermediateValue.padStart(padLength, "0");
@@ -695,22 +695,35 @@ export class TimescapeManager implements Options {
             }
             break;
           case "milliseconds":
-            if (this.#cursorPosition < 3) {
-              setIntermediateValue(key);
+            if (this.#cursorPosition < 4) {
               // Append the new digit and shift the digits to the left
+              const newValue = intermediateValue + key;
+              setIntermediateValue(newValue);
               this.#cursorPosition += 1;
 
-              // When we have 3 digits, update the actual milliseconds
-              if (this.#cursorPosition === 3) {
-                setValue(type, number);
+              // When we have 4 digits, update the actual milliseconds
+              if (this.#cursorPosition === 4) {
+                setValue("milliseconds", Number(newValue));
                 this.#focusNextField(type);
               }
-            } else {
-              const finalValue = Math.min(Number(intermediateValue + key), 999);
-              setValue(type, finalValue);
-              this.#focusNextField(type, 1);
             }
             break;
+            // if (this.#cursorPosition < 3) {
+            //   setIntermediateValue(key);
+            //   // Append the new digit and shift the digits to the left
+            //   this.#cursorPosition += 1;
+
+            //   // When we have 3 digits, update the actual milliseconds
+            //   if (this.#cursorPosition === 3) {
+            //     setValue(type, number);
+            //     this.#focusNextField(type);
+            //   }
+            // } else {
+            //   const finalValue = Math.min(Number(intermediateValue + key), 999);
+            //   setValue(type, finalValue);
+            //   this.#focusNextField(type, 1);
+            // }
+            // break;
         }
         break;
       }
